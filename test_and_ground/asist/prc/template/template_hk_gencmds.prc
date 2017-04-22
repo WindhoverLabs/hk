@@ -57,6 +57,10 @@ PROC $sc_$cpu_hk_gencmds
 ;	07/02/10	Walt Moleski    Updated to use the default table name
 ;                                       and to call $sc_$cpu_hk_start_apps
 ;	03/08/11	Walt Moleski	Added variable for app name
+;       11/08/16        Walt Moleski    Updated for HK 2.4.1.0 using CPU1 for
+;                                       commanding and added a hostCPU variable
+;                                       for the utility procs to connect to the
+;                                       proper host IP address.
 ;
 ;  Arguments
 ;	None.
@@ -124,6 +128,7 @@ LOCAL stream1
 LOCAL outmsgid
 
 local HKAppName = "HK"
+local hostCPU = "$CPU"
 
 write ";*********************************************************************"
 write ";  Step 1.0:  Initialize the CPU for this test. "
@@ -134,9 +139,9 @@ write ";********************************************************************"
 wait 10
 
 close_data_center
-wait 75
+wait 60
                                                                                 
-cfe_startup $CPU
+cfe_startup {hostCPU}
 wait 5
 
 ;; Display the pages
@@ -160,7 +165,7 @@ enddo
 
 write "==> Default Copy Table filename = '",tableFileName,"'"
 
-s ftp_file("CF:0/apps", "hk_cpy_tbl.tbl", tableFileName, "$CPU", "P")
+s ftp_file("CF:0/apps", "hk_cpy_tbl.tbl", tableFileName, hostCPU, "P")
 
 write ";*********************************************************************"
 write ";  Step 1.3:  Start the Housekeeping (HK) Application and "
@@ -295,20 +300,26 @@ if ($SC_$CPU_HK_CMDEC = 0) then
 endif
 
 if ($SC_$CPU_HK_CMBPKTSSENT = 0) or ($SC_$CPU_HK_MISSDATACTR = 0) then
-   ;;  using test application send output message 1 command to HK
+  ;; send output message 1 command to HK
+  ;;NOTE: If the MID for the request is changed, this will not work
    ;; CPU1 is the default
    outmsgid = 0x89c
+  rawCmd = "189cc00000030000"
 
-   if ("$CPU" = "CPU2") then
-      outmsgid = 0x99c
-   elseif ("$CPU" = "CPU3") then
-      outmsgid = 0xa9c
-   endif
+  if ("$CPU" = "CPU2") then
+    outmsgid = 0x99c
+    rawCmd = "199cc00000030000"
+  elseif ("$CPU" = "CPU3") then
+    outmsgid = 0xa9c
+    rawCmd = "1a9cc00000030000"
+  endif
 
-  /$SC_$CPU_TST_HK_SENDOUTMSG MsgId=outmsgid Pad= 0
+  ;;  /$SC_$CPU_TST_HK_SENDOUTMSG MsgId=outmsgid Pad= 0
+  rawCmd = rawCmd & %hex(outmsgid,4)
+  write ">> RawCmd = '",rawCmd,"'"
+  /RAW {rawCmd}
   wait 5
 endif
-
 
 ;; Setup for the expected event
 ut_setupevents "$SC", "$CPU", {HKAppName}, HK_RESET_CNTRS_CMD_EID, "DEBUG", 1
@@ -519,9 +530,9 @@ write ";*********************************************************************"
 wait 10
 
 close_data_center
-wait 75
+wait 60
                                                                                 
-cfe_startup $CPU
+cfe_startup {hostCPU}
 wait 5
 
 write "**** Requirements Status Reporting"

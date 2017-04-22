@@ -1,8 +1,8 @@
 /************************************************************************
 ** File:
-**   $Id: hk_utils.c 1.7.1.1 2015/03/04 15:02:50EST sstrege Exp  $
+**   $Id: hk_utils.c 1.4 2016/10/28 16:48:07EDT mdeschu Exp  $
 **
-**  Copyright © 2007-2014 United States Government as represented by the 
+**  Copyright Â© 2007-2014 United States Government as represented by the 
 **  Administrator of the National Aeronautics and Space Administration. 
 **  All Other Rights Reserved.  
 **
@@ -18,8 +18,19 @@
 ** Notes:
 **
 ** $Log: hk_utils.c  $
-** Revision 1.7.1.1 2015/03/04 15:02:50EST sstrege 
+** Revision 1.4 2016/10/28 16:48:07EDT mdeschu 
+** 
+** Revision 1.3 2016/10/28 10:51:14EDT mdeschu 
+** Fix compiler format warnings in calls to CFE_EVS_SendEvent  by casting them appropriately
+** Revision 1.2 2015/11/10 16:48:56EST lwalling 
+** Restore data lost in MKS 2010 from MKS 2009
+** Revision 1.1 2015/07/25 21:31:40EDT rperera 
+** Initial revision
+** Member added to project /CFS-APPs-PROJECT/hk/fsw/src/project.pj
+** Revision 1.9 2015/03/04 15:00:46EST sstrege 
 ** Added copyright information
+** Revision 1.8 2014/06/20 15:15:34EDT sjudy 
+** Initialize MessageLength to 0 in HK_ProcessIncomingHkData.
 ** Revision 1.7 2012/08/15 18:33:03EDT aschoeni 
 ** Added ability to discard incomplete combo packets
 ** Revision 1.6 2012/03/23 17:29:26EDT lwalling 
@@ -68,7 +79,7 @@ void HK_ProcessIncomingHkData (CFE_SB_MsgPtr_t MessagePtr)
     CFE_SB_MsgId_t                  MessageID;
     uint8                         * DestPtr;
     uint8                         * SrcPtr;
-    int32                           MessageLength;
+    int32                           MessageLength=0;
     int32                           MessageErrors;
     int32                           LastByteAccessed;
 
@@ -116,7 +127,7 @@ void HK_ProcessIncomingHkData (CFE_SB_MsgPtr_t MessagePtr)
     {
         CFE_EVS_SendEvent (HK_ACCESSING_PAST_PACKET_END_EID, CFE_EVS_ERROR,
                            "HK table definition exceeds packet length. MID:0x%04X, Length:%d, Count:%d",
-                           MessageID, MessageLength, MessageErrors);
+                           MessageID, (int)MessageLength, (int)MessageErrors);
     }
 
     return;
@@ -244,7 +255,7 @@ void HK_ProcessNewCopyTable (hk_copy_table_entry_t * CpyTblPtr,
                 {
                     CFE_EVS_SendEvent (HK_MEM_POOL_MALLOC_FAILED_EID, CFE_EVS_ERROR,
                                        "HK Processing New Table: ES_GetPoolBuf for size %d returned 0x%04X",
-                                       SizeOfThisPacket, Result);
+                                       (int)SizeOfThisPacket, (unsigned int)Result);
                 }
             }
         }
@@ -275,7 +286,7 @@ void HK_ProcessNewCopyTable (hk_copy_table_entry_t * CpyTblPtr,
             {
                 CFE_EVS_SendEvent (HK_CANT_SUBSCRIBE_TO_SB_PKT_EID, CFE_EVS_ERROR,
                                    "HK Processing New Table:SB_Subscribe for Mid 0x%04X returned 0x%04X",
-                                   OuterCpyEntry->InputMid, Result);
+                                   OuterCpyEntry->InputMid, (unsigned int)Result);
             }
         }
     }
@@ -340,8 +351,9 @@ void HK_TearDownOldCopyTable (hk_copy_table_entry_t * CpyTblPtr,
             else
             {
                 CFE_EVS_SendEvent (HK_MEM_POOL_FREE_FAILED_EID, CFE_EVS_ERROR,
-                                   "HK TearDown: ES_putPoolBuf Err pkt:0x%08X ret 0x%04X, hdl 0x%08x",
-                                   SavedPktAddr, Result,HK_AppData.MemPoolHandle);
+                                   "HK TearDown: ES_putPoolBuf Err pkt:0x%08lX ret 0x%04X, hdl 0x%08lx",
+                                   (unsigned long)SavedPktAddr, (unsigned int)Result, (unsigned long)HK_AppData.MemPoolHandle);
+
             }
         }
 
@@ -381,21 +393,17 @@ void HK_TearDownOldCopyTable (hk_copy_table_entry_t * CpyTblPtr,
 void HK_SendCombinedHkPacket (CFE_SB_MsgId_t WhichMidToSend)
 {
     boolean                         PacketFound = FALSE;
-    hk_copy_table_entry_t         * StartOfCopyTable;
-    hk_copy_table_entry_t         * CpyTblEntry;
     hk_runtime_tbl_entry_t        * StartOfRtTable;
     hk_runtime_tbl_entry_t        * RtTblEntry;
     int32                           Loop;
     CFE_SB_MsgId_t                  ThisEntrysOutMid;
     CFE_SB_MsgId_t                  InputMidMissing;
 
-    StartOfCopyTable = (hk_copy_table_entry_t *) HK_AppData.CopyTablePtr;
     StartOfRtTable  = (hk_runtime_tbl_entry_t *)  HK_AppData.RuntimeTablePtr;
 
     /* Look thru each item in this Table, but only send this packet once, at most */
     for (Loop = 0; ( (Loop < HK_COPY_TABLE_ENTRIES) && (PacketFound == FALSE) ); Loop++)
     {
-        CpyTblEntry = & StartOfCopyTable [Loop];
         RtTblEntry  = & StartOfRtTable [Loop];
 
         /* Empty table entries are defined by NULL's in this field */
@@ -485,7 +493,7 @@ void HK_CheckStatusOfTables (void)
             
         CFE_EVS_SendEvent (HK_UNEXPECTED_GETSTAT_RET_EID, CFE_EVS_ERROR,
                "Unexpected CFE_TBL_GetStatus return (0x%08X) for Copy Table", 
-               Status);
+               (unsigned int)Status);
     }
  
 #if 0
@@ -522,7 +530,7 @@ void HK_CheckStatusOfTables (void)
         
         CFE_EVS_SendEvent (HK_UNEXPECTED_GETSTAT2_RET_EID, CFE_EVS_ERROR,
                "Unexpected CFE_TBL_GetStatus return (0x%08X) for Runtime Table", 
-               Status);
+               (unsigned int)Status);
     }
     
     return;

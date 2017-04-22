@@ -1,8 +1,8 @@
 /************************************************************************
 ** File:
-**   $Id: hk_verify.h 1.5 2015/03/04 14:58:30EST sstrege Exp  $
+**   $Id: hk_verify.h 1.3 2016/10/28 16:48:05EDT mdeschu Exp  $
 **
-**  Copyright © 2007-2014 United States Government as represented by the 
+**  Copyright Â© 2007-2014 United States Government as represented by the 
 **  Administrator of the National Aeronautics and Space Administration. 
 **  All Other Rights Reserved.  
 **
@@ -17,6 +17,13 @@
 ** Notes:
 **
 ** $Log: hk_verify.h  $
+** Revision 1.3 2016/10/28 16:48:05EDT mdeschu 
+** 
+** Revision 1.2 2015/11/10 16:48:57EST lwalling 
+** Restore data lost in MKS 2010 from MKS 2009
+** Revision 1.1 2015/07/25 21:31:44EDT rperera 
+** Initial revision
+** Member added to project /CFS-APPs-PROJECT/hk/fsw/src/project.pj
 ** Revision 1.5 2015/03/04 14:58:30EST sstrege 
 ** Added copyright information
 ** Revision 1.4 2012/08/15 18:32:10EDT aschoeni 
@@ -50,9 +57,15 @@
     #error HK_PIPE_DEPTH must be defined!
 #elif (HK_PIPE_DEPTH  <  1)
     #error HK_PIPE_DEPTH cannot be less than 1!
-#elif (HK_PIPE_DEPTH  >  CFE_SB_MAX_PIPE_DEPTH)
-    #error HK_PIPE_DEPTH cannot be greater than CFE_SB_MAX_PIPE_DEPTH!
 #endif
+/*
+ * JPH 2015-06-29 - Removed check of:
+ *  HK_PIPE_DEPTH  >  CFE_SB_MAX_PIPE_DEPTH
+ *
+ * This is not a valid check anymore, as the HK app does not have knowledge
+ * of CFE_SB_MAX_PIPE_DEPTH.  But if the configuration violates this rule it will
+ * show up as an obvious run-time error so the compile-time check is redundant.
+ */
 
 #ifndef HK_COPY_TABLE_ENTRIES
     #error HK_COPY_TABLE_ENTRIES must be defined!

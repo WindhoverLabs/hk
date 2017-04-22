@@ -1,8 +1,8 @@
 /************************************************************************
 ** File:
-**   $Id: hk_msgdefs.h 1.4 2015/03/04 14:58:28EST sstrege Exp  $
+**   $Id: hk_msgdefs.h 1.2 2015/11/10 16:48:58EST lwalling Exp  $
 **
-**  Copyright © 2007-2014 United States Government as represented by the 
+**  Copyright Â© 2007-2014 United States Government as represented by the 
 **  Administrator of the National Aeronautics and Space Administration. 
 **  All Other Rights Reserved.  
 **
@@ -17,6 +17,11 @@
 ** Notes:
 **
 ** $Log: hk_msgdefs.h  $
+** Revision 1.2 2015/11/10 16:48:58EST lwalling 
+** Restore data lost in MKS 2010 from MKS 2009
+** Revision 1.1 2015/07/25 21:31:37EDT rperera 
+** Initial revision
+** Member added to project /CFS-APPs-PROJECT/hk/fsw/src/project.pj
 ** Revision 1.4 2015/03/04 14:58:28EST sstrege 
 ** Added copyright information
 ** Revision 1.3 2011/11/30 16:01:06EST jmdagost 

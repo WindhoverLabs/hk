@@ -1,8 +1,8 @@
 /************************************************************************
 ** File:
-**   $Id: hk_app.c 1.17 2015/03/04 14:58:32EST sstrege Exp  $
+**   $Id: hk_app.c 1.3 2016/10/28 10:51:14EDT mdeschu Exp  $
 **
-**  Copyright © 2007-2014 United States Government as represented by the 
+**  Copyright Â© 2007-2014 United States Government as represented by the 
 **  Administrator of the National Aeronautics and Space Administration. 
 **  All Other Rights Reserved.  
 **
@@ -18,6 +18,13 @@
 ** Notes:
 **
 ** $Log: hk_app.c  $
+** Revision 1.3 2016/10/28 10:51:14EDT mdeschu 
+** Fix compiler format warnings in calls to CFE_EVS_SendEvent  by casting them appropriately
+** Revision 1.2 2015/11/10 16:49:05EST lwalling 
+** Restore data lost in MKS 2010 from MKS 2009
+** Revision 1.1 2015/07/25 21:31:29EDT rperera 
+** Initial revision
+** Member added to project /CFS-APPs-PROJECT/hk/fsw/src/project.pj
 ** Revision 1.17 2015/03/04 14:58:32EST sstrege 
 ** Added copyright information
 ** Revision 1.16 2012/08/23 17:12:31EDT aschoeni 
@@ -121,10 +128,10 @@ void HK_AppMain(void)
       if(Status != CFE_SUCCESS)
       {
         CFE_EVS_SendEvent(HK_RCV_MSG_ERR_EID, CFE_EVS_ERROR,
-               "HK_APP Exiting due to CFE_SB_RcvMsg error 0x%08X", Status);
+               "HK_APP Exiting due to CFE_SB_RcvMsg error 0x%08X", (unsigned int)Status);
 
         /* Write to syslog in case there is a problem with event services */
-        CFE_ES_WriteToSysLog("HK_APP Exiting due to CFE_SB_RcvMsg error 0x%08X\n", Status);
+        CFE_ES_WriteToSysLog("HK_APP Exiting due to CFE_SB_RcvMsg error 0x%08X\n", (unsigned int)Status);
 
         HK_AppData.RunStatus = CFE_ES_APP_ERROR;
       }
@@ -172,7 +179,7 @@ int32 HK_AppInit(void)
     Status = CFE_EVS_Register (NULL, 0, CFE_EVS_BINARY_FILTER);
     if (Status != CFE_SUCCESS)
     {
-       CFE_ES_WriteToSysLog("HK: error registering for event services: 0x%08X\n", Status);
+       CFE_ES_WriteToSysLog("HK: error registering for event services: 0x%08X\n", (unsigned int)Status);
        return (Status);
     }
 
@@ -182,7 +189,7 @@ int32 HK_AppInit(void)
     if (Status != CFE_SUCCESS)
     {
       CFE_EVS_SendEvent(HK_CR_PIPE_ERR_EID, CFE_EVS_ERROR,
-            "Error Creating SB Pipe,RC=0x%08X",Status);
+            "Error Creating SB Pipe,RC=0x%08X",(unsigned int)Status);
        return (Status);
     }
 
@@ -192,7 +199,7 @@ int32 HK_AppInit(void)
     {
       CFE_EVS_SendEvent(HK_SUB_CMB_ERR_EID, CFE_EVS_ERROR,
             "Error Subscribing to HK Snd Cmb Pkt, MID=0x%04X, RC=0x%08X",
-              HK_SEND_COMBINED_PKT_MID, Status);
+              HK_SEND_COMBINED_PKT_MID, (unsigned int)Status);
         return (Status);
      }
 
@@ -202,7 +209,7 @@ int32 HK_AppInit(void)
     {
       CFE_EVS_SendEvent(HK_SUB_REQ_ERR_EID, CFE_EVS_ERROR,
             "Error Subscribing to HK Request, MID=0x%04X, RC=0x%08X",
-            HK_SEND_HK_MID, Status);
+            HK_SEND_HK_MID, (unsigned int)Status);
         return (Status);
      }
 
@@ -212,7 +219,7 @@ int32 HK_AppInit(void)
     {
       CFE_EVS_SendEvent(HK_SUB_CMD_ERR_EID, CFE_EVS_ERROR,
             "Error Subscribing to HK Gnd Cmds, MID=0x%04X, RC=0x%08X",
-            HK_CMD_MID, Status);
+            HK_CMD_MID, (unsigned int)Status);
         return (Status);
      }
 
@@ -224,7 +231,7 @@ int32 HK_AppInit(void)
     if (Status != CFE_SUCCESS)
     {
       CFE_EVS_SendEvent(HK_CR_POOL_ERR_EID, CFE_EVS_ERROR,
-            "Error Creating Memory Pool,RC=0x%08X",Status);
+            "Error Creating Memory Pool,RC=0x%08X",(unsigned int)Status);
         return (Status);
      }
 
@@ -251,7 +258,7 @@ int32 HK_AppInit(void)
     if (Status != CFE_SUCCESS)
     {
       CFE_ES_WriteToSysLog(
-         "HK App:Error Sending Initialization Event,RC=0x%08X\n", Status);
+         "HK App:Error Sending Initialization Event,RC=0x%08X\n", (unsigned int)Status);
      }
 
 
@@ -279,7 +286,7 @@ int32 HK_TableInit (void)
     if (Status != CFE_SUCCESS)
     {
       CFE_EVS_SendEvent(HK_CPTBL_REG_ERR_EID, CFE_EVS_ERROR,
-            "Error Registering Copy Table,RC=0x%08X",Status);
+            "Error Registering Copy Table,RC=0x%08X",(unsigned int)Status);
         return (Status);
      }
 
@@ -293,7 +300,7 @@ int32 HK_TableInit (void)
     if (Status != CFE_SUCCESS)
     {
       CFE_EVS_SendEvent(HK_RTTBL_REG_ERR_EID, CFE_EVS_ERROR,
-            "Error Registering Runtime Table,RC=0x%08X",Status);
+            "Error Registering Runtime Table,RC=0x%08X",(unsigned int)Status);
         return (Status);
     }
 
@@ -304,7 +311,7 @@ int32 HK_TableInit (void)
     if (Status != CFE_SUCCESS)
     {
       CFE_EVS_SendEvent(HK_CPTBL_LD_ERR_EID, CFE_EVS_ERROR,
-            "Error Loading Copy Table,RC=0x%08X",Status);
+            "Error Loading Copy Table,RC=0x%08X",(unsigned int)Status);
         return (Status);
      }
 
@@ -313,7 +320,7 @@ int32 HK_TableInit (void)
     if (Status != CFE_SUCCESS)
     {
       CFE_EVS_SendEvent(HK_CPTBL_MNG_ERR_EID, CFE_EVS_ERROR,
-            "Error from TBL Manage call for Copy Table,RC=0x%08X",Status);
+            "Error from TBL Manage call for Copy Table,RC=0x%08X",(unsigned int)Status);
         return (Status);
      }
 
@@ -322,7 +329,7 @@ int32 HK_TableInit (void)
     if (Status != CFE_SUCCESS)
     {
       CFE_EVS_SendEvent(HK_RTTBL_MNG_ERR_EID, CFE_EVS_ERROR,
-            "Error from TBL Manage call for Runtime Table,RC=0x%08X",Status);
+            "Error from TBL Manage call for Runtime Table,RC=0x%08X",(unsigned int)Status);
         return (Status);
      }
 
@@ -333,7 +340,7 @@ int32 HK_TableInit (void)
     if (Status != CFE_TBL_INFO_UPDATED)
     {
       CFE_EVS_SendEvent(HK_CPTBL_GADR_ERR_EID, CFE_EVS_ERROR,
-            "Error Getting Adr for Cpy Tbl,RC=0x%08X",Status);
+            "Error Getting Adr for Cpy Tbl,RC=0x%08X",(unsigned int)Status);
         return (Status);
      }
 
@@ -343,7 +350,7 @@ int32 HK_TableInit (void)
     if (Status != CFE_SUCCESS)
     {
       CFE_EVS_SendEvent(HK_RTTBL_GADR_ERR_EID, CFE_EVS_ERROR,
-         "Error Getting Adr for Runtime Table,RC=0x%08X",Status);
+         "Error Getting Adr for Runtime Table,RC=0x%08X",(unsigned int)Status);
         return (Status);
      }
 
@@ -572,7 +579,7 @@ int32 HK_VerifyCmdLength (CFE_SB_MsgPtr_t MessagePtr,uint32 ExpectedLength)
 
         CFE_EVS_SendEvent(HK_CMD_LEN_ERR_EID, CFE_EVS_ERROR,
           "Cmd Msg with Bad length Rcvd: ID = 0x%X, CC = %d, Exp Len = %d, Len = %d",
-          MessageID, CommandCode, ExpectedLength, ActualLength);
+          MessageID, CommandCode, (int)ExpectedLength, ActualLength);
 
         Status = HK_BAD_MSG_LENGTH_RC;
 

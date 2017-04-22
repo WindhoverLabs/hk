@@ -60,6 +60,14 @@ PROC $sc_$cpu_hk_stressmissingdata
 ;       03/09/11        Walt Moleski    Added variables for app and table names
 ;       08/29/12        Walt Moleski    Updated to add check of Discard Packet
 ;					configuration parameter
+;       01/30/14        Walt Moleski    Updated to use raw commands for sending
+;                                       input messages rather than TST_HK.
+;       11/08/16        Walt Moleski    Updated for HK 2.4.1.0 using CPU1 for
+;                                       commanding and added a hostCPU variable
+;                                       for the utility procs to connect to the
+;                                       proper host IP address.
+;       11/09/16        Walt Moleski    Added use of global requirements array
+;                                       that was removed previously
 ;
 ;  Arguments
 ;	None.
@@ -96,10 +104,23 @@ local logging = %liv (log_procedure)
 
 %liv (log_procedure) = logging
 
+;; These are the requirements tested by this procedure
+;;#define HK_2000        0
+;;#define HK_2001        1
+;;#define HK_20012       2
+;;#define HK_20013       3
+;;#define HK_20016       4
+;;#define HK_3000        5
+;;#define HK_4000        6
+;;
+;;global ut_req_array_size = 6
+;;global ut_requirement[0 .. ut_req_array_size]
+
 for i = 0 to ut_req_array_size DO
   ut_requirement[i] = "U"
 enddo
 
+;; Mark the requirements not tested by this procedure
 ut_requirement[HK_20011] = "N"
 ut_requirement[HK_20015] = "N"
 ut_requirement[HK_20017] = "N"
@@ -115,8 +136,8 @@ endif
 ; Set the local values
 ;**********************************************************************
 LOCAL cfe_requirements[0 .. ut_req_array_size] = ["HK_2000","HK_2001", ;;
-	"HK_2001.1","HK_2001.2","HK_2001.3","HK_2001.5","HK_2001.6", ;;
-	"HK_2001.7","HK_3000","HK_4000"]
+        "HK_2001.1","HK_2001.2","HK_2001.3","HK_2001.5","HK_2001.6", ;;
+        "HK_2001.7","HK_3000","HK_4000"]
 
 ;**********************************************************************
 ; Define local variables
@@ -157,6 +178,8 @@ LOCAL DataBytePattern[0 .. 80]
 local HKAppName = "HK"
 local HKCopyTblName = HKAppName & "." & HK_COPY_TABLE_NAME
 
+local hostCPU = "$CPU"
+
 write ";*********************************************************************"
 write ";  Step 1.0:  Initialize the CPU for this test. "
 write ";*********************************************************************"
@@ -166,9 +189,9 @@ write ";********************************************************************"
 wait 10
 
 close_data_center
-wait 75
+wait 60
                                                                                 
-cfe_startup $CPU
+cfe_startup {hostCPU}
 wait 5
 
 ;; Display the pages
@@ -198,7 +221,7 @@ enddo
 
 write "==> Default Copy Table filename = '",tableFileName,"'"
 
-s ftp_file("CF:0/apps", "hk_cpy_tbl.tbl", tableFileName, "$CPU", "P")
+s ftp_file("CF:0/apps", "hk_cpy_tbl.tbl", tableFileName, hostCPU, "P")
 
 write ";*********************************************************************"
 write ";  Step 1.3:  Start the Housekeeping (HK) and Test Applications."
@@ -297,10 +320,31 @@ wait 10
 /$SC_$CPU_TO_ADDPACKET Stream=OutputPacket6 Pkt_Size=x'0' Priority=x'0' Reliability=x'1' Buflimit=x'4'
 wait 10
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket1 DataSize=32 DataPattern=0x01234567
-wait 2
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket2 DataSize=32 DataPattern=0x89abcdef
-wait 2
+local size, pktLen
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket1 DataSize=32 DataPattern=0x01234567
+;;wait 2
+size = 32
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket1,4) & "C000" & %hex(pktLen,4) & "000000000000"
+;; Add the data
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "01234567"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket2 DataSize=32 DataPattern=0x89abcdef
+;;wait 2
+rawCmd = %hex(InputPacket2,4) & "C000" & %hex(pktLen,4) & "000000000000"
+;; Add the data
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "89abcdef"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
 write ";*********************************************************************"
 write ";  Step 2.2: Send Output Message 1 command and check data"
@@ -499,8 +543,18 @@ s $SC_$CPU_hk_sendoutmsg(OutputPacket6, DataBytePattern, Pkt6, NoChecks, 0)
 write ";*********************************************************************"
 write ";  Step 3.0: Send only 1/2 the data."
 write ";*********************************************************************"
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket1 DataSize=32 DataPattern=0x12345678
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket1 DataSize=32 DataPattern=0x12345678
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 32
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket1,4) & "C000" & %hex(pktLen,4) & "000000000000"
+;; Add the data
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "12345678"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
 write ";*********************************************************************"
 write ";  Step 3.1: Send Output Message 1 command and check data"
@@ -699,10 +753,29 @@ s $SC_$CPU_hk_sendoutmsg(OutputPacket6, DataBytePattern, Pkt6, MissingYes, 0)
 write ";*********************************************************************"
 write ";  Step 4.0: Send all the data."
 write ";*********************************************************************"
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket1 DataSize=32 DataPattern=0x11112222
-wait 2
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket2 DataSize=32 DataPattern=0xaaaabbbb
-wait 2
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket1 DataSize=32 DataPattern=0x11112222
+;;wait 2
+size = 32
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket1,4) & "C000" & %hex(pktLen,4) & "000000000000"
+;; Add the data
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "11112222"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket2 DataSize=32 DataPattern=0xaaaabbbb
+;;wait 2
+rawCmd = %hex(InputPacket2,4) & "C000" & %hex(pktLen,4) & "000000000000"
+;; Add the data
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "aaaabbbb"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
 write ";*********************************************************************"
 write ";  Step 4.1: Send Output Message 1 command and check data"
@@ -1093,7 +1166,7 @@ DataBytePattern[16] = 0x11
 DataBytePattern[17] = 0xbb 
 DataBytePattern[18] = 0x22
 DataBytePattern[19] = 0xaa
-						
+
 for entry = 20 to 80 do
    DataBytePattern[entry] = 0	
 enddo
@@ -1107,9 +1180,9 @@ write ";*********************************************************************"
 wait 10
 
 close_data_center
-wait 75
+wait 60
                                                                                 
-cfe_startup $CPU
+cfe_startup {hostCPU}
 wait 5
 
 write "**** Requirements Status Reporting"

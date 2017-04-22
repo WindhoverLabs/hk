@@ -35,6 +35,8 @@ PROC $sc_$cpu_hk_copytable5
 ;	05/30/08	Barbie Medina	Updated to correct offset errors
 ;       03/08/11        Walt Moleski    Modified to use platform definitions for
 ;                                       Table name and number of entries.
+;       11/08/16        Walt Moleski    Added hostCPU variable for the utility
+;                                       proc create_table_file_from_cvt to use
 ;
 ;  Arguments
 ;	None.
@@ -61,7 +63,6 @@ local logging = %liv (log_procedure)
 write ";*********************************************************************"
 write ";  define local variables "
 write ";*********************************************************************"
-
 LOCAL entry
 LOCAL appid
 LOCAL OutputPacket1
@@ -88,6 +89,8 @@ LOCAL InputPacket17
 LOCAL InputPacket18
 LOCAL InputPacket19
 
+;; Need to change this to the proper CPU to create the table for
+local hostCPU = "$CPU"
 
 ;; CPU1 is the default
 appid = 0xfa6
@@ -794,7 +797,7 @@ enddo
 local HKCopyTblName = "HK." & HK_COPY_TABLE_NAME
 local endmnemonic = "$SC_$CPU_HK_CopyTable[" & HK_COPY_TABLE_ENTRIES & "].NumBytes"
  
-s create_tbl_file_from_cvt("$CPU",appid,"Copy Table 5","hk_cpy_tbl.tbl",HKCopyTblName,"$SC_$CPU_HK_CopyTable[1].InputMid",endmnemonic)
+s create_tbl_file_from_cvt(hostCPU,appid,"Copy Table 5","hk_cpy_tbl.tbl",HKCopyTblName,"$SC_$CPU_HK_CopyTable[1].InputMid",endmnemonic)
 
 
 write ";*********************************************************************"

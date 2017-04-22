@@ -1,8 +1,8 @@
 /************************************************************************
 ** File:
-**   $Id: hk_version.h 1.2.2.8 2015/03/04 15:24:32EST sstrege Exp  $
+**   $Id: hk_version.h 1.2.1.3 2016/11/09 19:57:20EST sstrege Exp  $
 **
-**  Copyright © 2007-2014 United States Government as represented by the 
+**  Copyright Â© 2007-2014 United States Government as represented by the 
 **  Administrator of the National Aeronautics and Space Administration. 
 **  All Other Rights Reserved.  
 **
@@ -17,22 +17,19 @@
 ** Notes:
 **
 ** $Log: hk_version.h  $
-** Revision 1.2.2.8 2015/03/04 15:24:32EST sstrege 
-** Changing the version number for the documentation update release to 2.4.0.
-** Revision 1.2.2.7 2015/03/04 15:02:49EST sstrege 
+** Revision 1.2.1.3 2016/11/09 19:57:20EST sstrege 
+** Changing version number for the release to 2.4.1
+** Revision 1.2.1.2 2016/10/31 15:56:04EDT sstrege 
+** Changing version number for the branch tip to 9.9.9.
+** Revision 1.2.1.1 2016/10/31 15:52:32EDT sstrege 
+** Changing version number for the branch to 2.4.1
+** Revision 1.2 2015/11/10 16:49:02EST lwalling 
+** Restore data lost in MKS 2010 from MKS 2009
+** Revision 1.1 2015/07/25 21:31:46EDT rperera 
+** Initial revision
+** Member added to project /CFS-APPs-PROJECT/hk/fsw/src/project.pj
+** Revision 1.2.3.1 2015/03/04 15:00:47EST sstrege 
 ** Added copyright information
-** Revision 1.2.2.6 2012/09/19 14:30:36EDT sstrege 
-** Changing the version number for the branch tip to 9.9.9.
-** Revision 1.2.2.5 2012/09/19 14:21:16EDT sstrege 
-** Changing the version number for the documentation release to 2.4.0.
-** Revision 1.2.2.4 2012/09/04 16:12:30EDT sstrege 
-** Changing the version number for the branch tip to 9.9.9.
-** Revision 1.2.2.3 2012/09/04 16:02:10EDT sstrege 
-** Changing the version number for the release to 2.4.0.
-** Revision 1.2.2.2 2012/08/27 13:27:11EDT nschweis 
-** Changing the version number for the branch tip to 9.9.9.
-** Revision 1.2.2.1 2012/08/27 13:17:49EDT nschweis 
-** Changing the version number for the branch to 2.4.0.
 ** Revision 1.2 2011/06/23 11:59:28EDT jmdagost 
 ** Moved HK_MISSION_REV to platform configuration.
 ** Revision 1.1 2008/07/15 16:50:16EDT rjmcgraw 
@@ -46,7 +43,7 @@
 
 #define HK_MAJOR_VERSION    2
 #define HK_MINOR_VERSION    4
-#define HK_REVISION         0
+#define HK_REVISION         1
       
 #endif /* _hk_version_h_ */
 

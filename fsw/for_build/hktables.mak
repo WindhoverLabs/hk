@@ -1,9 +1,12 @@
 ###############################################################################
 # File: CFS Application Table Makefile 
 #
-# $Id: hktables.mak 1.3 2010/07/16 13:28:39EDT jmdagost Exp  $
+# $Id: hktables.mak 1.1 2015/07/25 21:30:53EDT rperera Exp  $
 #
 # $Log: hktables.mak  $
+# Revision 1.1 2015/07/25 21:30:53EDT rperera 
+# Initial revision
+# Member added to project /CFS-APPs-PROJECT/hk/fsw/for_build/project.pj
 # Revision 1.3 2010/07/16 13:28:39EDT jmdagost 
 # Corrected to use CFS path instead of cFE path.
 # Revision 1.2 2010/07/02 14:58:11EDT jmdagost 

@@ -1,8 +1,8 @@
 /************************************************************************
 ** File:
-**   $Id: hk_platform_cfg.h 1.8 2015/03/04 14:58:29EST sstrege Exp  $
+**   $Id: hk_platform_cfg.h 1.2 2015/11/10 16:49:03EST lwalling Exp  $
 **
-**  Copyright © 2007-2014 United States Government as represented by the 
+**  Copyright Â© 2007-2014 United States Government as represented by the 
 **  Administrator of the National Aeronautics and Space Administration. 
 **  All Other Rights Reserved.  
 **
@@ -17,6 +17,11 @@
 ** Notes:
 **
 ** $Log: hk_platform_cfg.h  $
+** Revision 1.2 2015/11/10 16:49:03EST lwalling 
+** Restore data lost in MKS 2010 from MKS 2009
+** Revision 1.1 2015/07/25 21:31:16EDT rperera 
+** Initial revision
+** Member added to project /CFS-APPs-PROJECT/hk/fsw/platform_inc/project.pj
 ** Revision 1.8 2015/03/04 14:58:29EST sstrege 
 ** Added copyright information
 ** Revision 1.7 2012/08/15 18:32:39EDT aschoeni 

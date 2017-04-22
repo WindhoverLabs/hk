@@ -15,6 +15,8 @@ PROC $sc_$cpu_hk_sendoutmsg(OutputPktID, DataBytePattern[], PktNo, Checking, Sta
 ;       06/02/08        Barbie Medina   Original Procedure.
 ;       08/29/12        Walt Moleski	Updated to handle Discard of Packet if
 ;					data is missing and config param is set
+;       01/29/14        Walt Moleski	Updated to Send HK Combined Packet
+;					Request using a raw command.
 ;*******************************************************************************
 local logging = %liv (log_procedure)
 %liv (log_procedure) = FALSE
@@ -39,18 +41,14 @@ currentCnt = $SC_$CPU_HK_CMBPKTSSENT
 count =  $SC_$CPU_HK_CMBPKTSSENT+1
 missing = $SC_$CPU_HK_MISSDATACTR+1
 
-;; The event is the same no matter what Checking is set to
-;; Commenting out this if
-;;if (Checking = MissingYes) then
-;;  ut_setupevents "$SC","$CPU",{HKAppName},HK_OUTPKT_MISSING_DATA_EID,"DEBUG", 1
-;;elseif (Checking = TstPktLen) or (Checking = TstLenTstTbl) then
-;;  ut_setupevents "$SC","$CPU",{HKAppName},HK_OUTPKT_MISSING_DATA_EID,"DEBUG", 1
-;;endif
-
 ut_setupevents "$SC","$CPU",{HKAppName},HK_OUTPKT_MISSING_DATA_EID,"DEBUG", 1
 
-;;send output packet 1 command to test app
-/$SC_$CPU_TST_HK_SENDOUTMSG MsgId=OutputPktID Pad=0
+;;send output packet request to test app
+;;/$SC_$CPU_TST_HK_SENDOUTMSG MsgId=OutputPktID Pad=0
+;;NOTE: If the MID for the request is changed, this will not work
+local rawCmd = "189cc00000030000" & %hex(OutputPktID,4)
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
 
 ;;wait for output packet to update
 wait 10

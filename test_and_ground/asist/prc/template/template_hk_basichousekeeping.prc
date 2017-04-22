@@ -53,6 +53,14 @@ PROC $sc_$cpu_hk_basichousekeeping
 ;                                       for output packets to update
 ;       07/02/10        Walt Moleski	Updated to use the default table name
 ;					and to call $sc_$cpu_hk_start_apps
+;       01/30/14        Walt Moleski	Updated to use raw commands for sending
+;					input messages rather than TST_HK.
+;	11/08/16	Walt Moleski	Updated for HK 2.4.1.0 using CPU1 for
+;					commanding and added a hostCPU variable
+;					for the utility procs to connect to the
+;					proper host IP address.
+;	11/09/16	Walt Moleski	Added use of global requirements array
+;					that was removed previously
 ;
 ;  Arguments
 ;	None.
@@ -92,10 +100,21 @@ local logging = %liv (log_procedure)
 
 %liv (log_procedure) = logging
 
+;; These are the requirements tested by this procedure
+;;#define HK_2000        0
+;;#define HK_2001        1
+;;#define HK_20011       2
+;;#define HK_3000        3
+;;#define HK_4000        4
+
+;;global ut_req_array_size = 4
+;;global ut_requirement[0 .. ut_req_array_size]
+
 for i = 0 to ut_req_array_size DO
   ut_requirement[i] = "U"
 enddo
 
+;; Mark the requirements not tested by this procedure
 ut_requirement[HK_20012] = "N"
 ut_requirement[HK_20013] = "N"
 ut_requirement[HK_20015] = "N"
@@ -144,6 +163,7 @@ LOCAL InputPacket21
 LOCAL DataBytePattern[0 .. 80]
 
 local HKAppName = "HK"
+local hostCPU = "$CPU"
 
 write ";*********************************************************************"
 write ";  Step 1.0:  Initialize the CPU for this test. "
@@ -154,9 +174,9 @@ write ";********************************************************************"
 wait 10
 
 close_data_center
-wait 75
+wait 60
                                                                                 
-cfe_startup $CPU
+cfe_startup {hostCPU}
 wait 5
 
 ;; Display the pages
@@ -184,7 +204,7 @@ enddo
 
 write "==> Default Copy Table filename = '",tableFileName,"'"
 
-s ftp_file("CF:0/apps", "hk_cpy_tbl.tbl", tableFileName, "$CPU", "P")
+s ftp_file("CF:0/apps", "hk_cpy_tbl.tbl", tableFileName, hostCPU, "P")
 
 write ";*********************************************************************"
 write ";  Step 1.3:  Start the Housekeeping (HK) and Test Applications"
@@ -319,46 +339,219 @@ endif
 /$SC_$CPU_TO_ADDPACKET Stream=OutputPacket2 Pkt_Size=x'0' Priority=x'0' Reliability=x'1' Buflimit=x'4'
 /$SC_$CPU_TO_ADDPACKET Stream=OutputPacket3 Pkt_Size=x'0' Priority=x'0' Reliability=x'1' Buflimit=x'4'
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket1 DataSize=4 DataPattern =0x01234567
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket2 DataSize=8 DataPattern =0x12345678
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket3 DataSize=16 DataPattern =0x23456789
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket4 DataSize=32 DataPattern =0x3456789a
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket5 DataSize=32 DataPattern =0x456789ab
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket6 DataSize=16 DataPattern =0x56789abc
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket7 DataSize=8 DataPattern =0x6789abcd
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket8 DataSize=4 DataPattern =0x789abcde
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket9 DataSize=4 DataPattern =0x89abcdef
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket10 DataSize=8 DataPattern =0x9abcdef0
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket11 DataSize=8 DataPattern =0xabcdef01
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket12 DataSize=4 DataPattern =0xbcdef012
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket13 DataSize=4 DataPattern =0xcdef0123
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket14 DataSize=8 DataPattern =0xdef01234
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket15 DataSize=16 DataPattern =0xef012345
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket16 DataSize=32 DataPattern =0xf0123456
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket17 DataSize=32 DataPattern =0x76543210
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket18 DataSize=16 DataPattern =0x87654321
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket19 DataSize=8 DataPattern =0x98765432
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket20 DataSize=4 DataPattern =0xa9876543
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+local size, pktLen
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket1 DataSize=4 DataPattern =0x01234567
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 4
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket1,4) & "C000" & %hex(pktLen,4) & "00000000000001234567"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket2 DataSize=8 DataPattern =0x12345678
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 8
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket2,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "12345678"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket3 DataSize=16 DataPattern =0x23456789
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 16
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket3,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "23456789"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket4 DataSize=32 DataPattern =0x3456789a
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 32
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket4,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "3456789a"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket5 DataSize=32 DataPattern =0x456789ab
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+rawCmd = %hex(InputPacket5,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "456789ab"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket6 DataSize=16 DataPattern =0x56789abc
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 16
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket6,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "56789abc"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket7 DataSize=8 DataPattern =0x6789abcd
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 8
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket7,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "6789abcd"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket8 DataSize=4 DataPattern =0x789abcde
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 4
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket8,4) & "C000" & %hex(pktLen,4) & "000000000000789abcde"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket9 DataSize=4 DataPattern =0x89abcdef
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+rawCmd = %hex(InputPacket9,4) & "C000" & %hex(pktLen,4) & "00000000000089abcdef"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket10 DataSize=8 DataPattern =0x9abcdef0
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 8
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket10,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "9abcdef0"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket11 DataSize=8 DataPattern =0xabcdef01
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+rawCmd = %hex(InputPacket11,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "abcdef01"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket12 DataSize=4 DataPattern =0xbcdef012
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 4
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket12,4) & "C000" & %hex(pktLen,4) & "000000000000bcdef012"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket13 DataSize=4 DataPattern =0xcdef0123
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+rawCmd = %hex(InputPacket13,4) & "C000" & %hex(pktLen,4) & "000000000000cdef0123"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket14 DataSize=8 DataPattern =0xdef01234
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 8
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket14,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "def01234"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket15 DataSize=16 DataPattern =0xef012345
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 16
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket15,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "ef012345"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket16 DataSize=32 DataPattern =0xf0123456
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 32
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket16,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "f0123456"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket17 DataSize=32 DataPattern =0x76543210
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+rawCmd = %hex(InputPacket17,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "76543210"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket18 DataSize=16 DataPattern =0x87654321
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 16
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket18,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "87654321"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket19 DataSize=8 DataPattern =0x98765432
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 8
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket19,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "98765432"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
+
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket20 DataSize=4 DataPattern =0xa9876543
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 4
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket20,4) & "C000" & %hex(pktLen,4) & "000000000000a9876543"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
 write ";*********************************************************************"
 write ";  Step 2.2: Send Output Message 1 command and check data"
@@ -534,7 +727,7 @@ write ";  Step 3.1: Generate and upload updated copy table"
 write ";*********************************************************************"
 s $SC_$CPU_hk_copytable2
 
-start load_table("hk_cpy_tbl.tbl", "$CPU")
+start load_table("hk_cpy_tbl.tbl", hostCPU)
 wait 5
 
 ut_sendcmd "$SC_$CPU_TBL_VALIDATE INACTIVE VTABLENAME=""HK.CopyTable"""
@@ -561,72 +754,231 @@ elseif ("$CPU" = "CPU3") then
 endif 
 
 ;; Already did Pkts 1 & 2 in Step 2.1
-;;/$SC_$CPU_TO_ADDPACKET Stream=OutputPacket1 Pkt_Size=x'0' Priority=x'0' Reliability=x'1' Buflimit=x'4'
-;;/$SC_$CPU_TO_ADDPACKET Stream=OutputPacket2 Pkt_Size=x'0' Priority=x'0' Reliability=x'1' Buflimit=x'4'
 /$SC_$CPU_TO_ADDPACKET Stream=OutputPacket4 Pkt_Size=x'0' Priority=x'0' Reliability=x'1' Buflimit=x'4'
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket1 DataSize=4 DataPattern =0x11111111
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket1 DataSize=4 DataPattern =0x11111111
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 4
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket1,4) & "C000" & %hex(pktLen,4) & "00000000000011111111"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket2 DataSize=8 DataPattern =0x22222222
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket2 DataSize=8 DataPattern =0x22222222
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 8
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket2,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "22222222"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket3 DataSize=16 DataPattern =0x33333333
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket3 DataSize=16 DataPattern =0x33333333
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 16
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket3,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "33333333"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket4 DataSize=32 DataPattern =0x44444444
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket4 DataSize=32 DataPattern =0x44444444
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 32
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket4,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "44444444"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket5 DataSize=32 DataPattern =0x55555555
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket5 DataSize=32 DataPattern =0x55555555
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+rawCmd = %hex(InputPacket5,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "55555555"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket6 DataSize=16 DataPattern =0x66666666
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket6 DataSize=16 DataPattern =0x66666666
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 16
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket6,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "66666666"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket7 DataSize=8 DataPattern =0x77777777
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket7 DataSize=8 DataPattern =0x77777777
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 8
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket7,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "77777777"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket8 DataSize=4 DataPattern =0x88888888
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket8 DataSize=4 DataPattern =0x88888888
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 4
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket8,4) & "C000" & %hex(pktLen,4) & "00000000000088888888"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket9 DataSize=4 DataPattern =0x99999999
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket9 DataSize=4 DataPattern =0x99999999
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+rawCmd = %hex(InputPacket9,4) & "C000" & %hex(pktLen,4) & "00000000000099999999"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket10 DataSize=8 DataPattern =0xaaaaaaaa
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket10 DataSize=8 DataPattern =0xaaaaaaaa
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 8
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket10,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "aaaaaaaa"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket11 DataSize=8 DataPattern =0xbbbbbbbb
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket11 DataSize=8 DataPattern =0xbbbbbbbb
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+rawCmd = %hex(InputPacket11,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "bbbbbbbb"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket12 DataSize=4 DataPattern =0xcccccccc
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket12 DataSize=4 DataPattern =0xcccccccc
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 4
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket12,4) & "C000" & %hex(pktLen,4) & "000000000000cccccccc"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket13 DataSize=4 DataPattern =0xdddddddd
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket13 DataSize=4 DataPattern =0xdddddddd
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+rawCmd = %hex(InputPacket13,4) & "C000" & %hex(pktLen,4) & "000000000000dddddddd"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket14 DataSize=8 DataPattern =0xeeeeeeee
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket14 DataSize=8 DataPattern =0xeeeeeeee
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 8
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket14,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "eeeeeeee"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket15 DataSize=16 DataPattern =0x12345678
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket15 DataSize=16 DataPattern =0x12345678
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 16
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket15,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "12345678"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket16 DataSize=32 DataPattern =0x16161616
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket16 DataSize=32 DataPattern =0x16161616
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 32
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket16,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "16161616"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket17 DataSize=32 DataPattern =0x17171717
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket17 DataSize=32 DataPattern =0x17171717
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+rawCmd = %hex(InputPacket17,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "17171717"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket18 DataSize=16 DataPattern =0x18181818
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket18 DataSize=16 DataPattern =0x18181818
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 16
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket18,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "18181818"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket19 DataSize=8 DataPattern =0x19191919
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket19 DataSize=8 DataPattern =0x19191919
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 8
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket19,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "19191919"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket20 DataSize=4 DataPattern =0x20202020
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket20 DataSize=4 DataPattern =0x20202020
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 4
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket20,4) & "C000" & %hex(pktLen,4) & "00000000000020202020"
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
-/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket21 DataSize=16 DataPattern =0xffffffff
-ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+;;/$SC_$CPU_TST_HK_SENDINMSG MsgId=InputPacket21 DataSize=16 DataPattern =0xffffffff
+;;ut_tlmupdate $SC_$CPU_TST_HK_CMDPC
+size = 16
+pktLen = (12 + size) - 7
+rawCmd = %hex(InputPacket21,4) & "C000" & %hex(pktLen,4) & "000000000000"
+for i = 1 to size/4 do
+  rawCmd = rawCmd & "ffffffff"
+enddo
+write ">> RawCmd = '",rawCmd,"'"
+/RAW {rawCmd}
+wait 1
 
 write ";*********************************************************************"
 write ";  Step 3.3: Send Output Message 1 command and check data"
@@ -801,9 +1153,9 @@ write ";*********************************************************************"
 wait 10
 
 close_data_center
-wait 75
-                                                                                
-cfe_startup $CPU
+wait 60
+
+cfe_startup {hostCPU}
 wait 5
 
 write "**** Requirements Status Reporting"

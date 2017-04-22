@@ -1,8 +1,8 @@
 /************************************************************************
 ** File:
-**   $Id: hk_events.h 1.10.1.1 2015/03/04 15:02:50EST sstrege Exp  $
+**   $Id: hk_events.h 1.2 2015/11/10 16:49:33EST lwalling Exp  $
 **
-**  Copyright © 2007-2014 United States Government as represented by the 
+**  Copyright Â© 2007-2014 United States Government as represented by the 
 **  Administrator of the National Aeronautics and Space Administration. 
 **  All Other Rights Reserved.  
 **
@@ -17,8 +17,15 @@
 ** Notes:
 **
 ** $Log: hk_events.h  $
-** Revision 1.10.1.1 2015/03/04 15:02:50EST sstrege 
+** Revision 1.2 2015/11/10 16:49:33EST lwalling 
+** Restore data lost in MKS 2010 from MKS 2009
+** Revision 1.1 2015/07/25 21:31:33EDT rperera 
+** Initial revision
+** Member added to project /CFS-APPs-PROJECT/hk/fsw/src/project.pj
+** Revision 1.12 2015/03/04 15:00:46EST sstrege 
 ** Added copyright information
+** Revision 1.11 2014/06/20 15:50:59EDT sjudy 
+** Deleted unused event ID def.
 ** Revision 1.10 2012/08/23 17:12:32EDT aschoeni 
 ** Made internal commands no longer increment error counters (and changed event message slightly).
 ** Revision 1.9 2012/03/23 17:40:57EDT lwalling 
@@ -213,19 +220,6 @@
 **  an output message. 
 **/
 #define HK_OUTPKT_MISSING_DATA_EID          12
-
-
-/** \brief <tt> 'Error Registering Events,RC=0x\%08X' </tt>
-**  \event <tt> 'Error Registering Events,RC=0x\%08X' </tt>
-**
-**  \par Type: ERROR
-**
-**  \par Cause:
-**
-**  This event message is issued when the call to CFE_EVS_Register
-**  during HK initialization returns a value other than CFE_SUCCESS  
-**/
-#define HK_EVS_REG_ERR_EID					13
 
 
 /** \brief <tt> 'Error Creating SB Pipe,RC=0x\%08X' </tt>

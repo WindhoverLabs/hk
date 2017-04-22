@@ -7,6 +7,8 @@
 *  Change History
 *	Date		   Name		Description
 *	06/5/08	 Barbie Medina	Original header file.
+*       01/30/14 Walt Moleski	Commented out requirement globals and defines
+*                               since they were added to the test procedures.
 *
 *******************************************************************************/
 

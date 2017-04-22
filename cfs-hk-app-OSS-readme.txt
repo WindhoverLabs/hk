@@ -1,10 +1,10 @@
 core Flight System (cFS) Housekeeping Application (HK) 
 Open Source Release Readme
 
-HK Release 2.4.0 
+HK Release 2.4.1 
 
 Date: 
-February 27, 2015
+November 9, 2016
 
 Introduction:
   The Housekeeping application (HK) is a core Flight System (cFS) application 
@@ -35,7 +35,7 @@ Introduction:
   available in cfs-hk-2.4.0-OSS-release/docs/users_guide
   
   There are also "Quick start" instructions provided in 
-  cFE-6.4.1-OSS-release/cfe-OSS-readme.txt   
+  cFE-6.5.0-OSS-release/cfe-OSS-readme.txt   
   
   The OSAL is available at http://sourceforge.net/projects/osal/ and 
   github.com/nasa/
@@ -47,16 +47,16 @@ Introduction:
  
  
 Software Included:
-  Housekeeping application (HK) 2.4.0
+  Housekeeping application (HK) 2.4.1
   
  
 Software Required:
 
- Operating System Abstraction Layer 4.1.1 or higher can be 
+ Operating System Abstraction Layer 4.2.0 or higher can be 
  obtained at http://sourceforge.net/projects/osal or 
  github.com/nasa/osal
  
- core Flight Executive 6.4.1 or higher can be obtained at
+ core Flight Executive 6.5.0 or higher can be obtained at
  http://sorceforge.net/projects/coreflightexec
 
   

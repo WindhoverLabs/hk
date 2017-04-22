@@ -26,6 +26,9 @@
 
   \verbatim  
   $Log: cfs_hk.dox  $
+  Revision 1.1 2015/07/25 21:29:45EDT rperera 
+  Initial revision
+  Member added to project /CFS-APPs-PROJECT/hk/docs/dox_src/detailed_design/project.pj
   Revision 1.3 2010/03/09 14:33:45EST jmdagost 
   Updated deployment guide section.
   Revision 1.2 2009/04/18 12:55:18EDT dkobe 
