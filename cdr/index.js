@@ -6,32 +6,26 @@ const CdrPlugin = require(path.join(global.CDR_INSTALL_DIR, '/commander/classes/
 
 module.exports = class CfeCdrPlugin extends CdrPlugin {
   constructor(urlBase) {
-    super('amc', path.join(__dirname, 'web', urlBase));
+    super('hk', path.join(__dirname, 'web', urlBase));
   }
 
   getContent() {
     var result = {
-      shortDescription: 'Actuator and Motor Control',
-      longDescription: 'Actuator and Motor Control.',
+      shortDescription: 'Housekeeping',
+      longDescription: 'Housekeeping',
       nodes: {
 				main: {
 					type: CdrPlugin.ContentType.LAYOUT,
 					shortDescription: 'Main',
-					longDescription: 'Main AMC.',
+					longDescription: 'Main HK.',
 					filePath: '/main_layout.lyt'
 				},
-				cdh: {
+				hk: {
 					type: CdrPlugin.ContentType.PANEL,
-					shortDescription: 'Command and Data Handling',
-					longDescription: 'Command counters.',
-					filePath: '/cdh.pug'
-				},
-                ao: {
-                    type: CdrPlugin.ContentType.PANEL,
-                    shortDescription: 'Actuator Outputs',
-                    longDescription: 'Actuator Outputs',
-                    filePath: '/ao.pug'
-                }
+					shortDescription: 'HK HK',
+					longDescription: 'Housekeeping Housekeeping',
+					filePath: '/hk.pug'
+				}
       }
     };
 
