@@ -1,7 +1,7 @@
 {
     "Airliner": {
         "apps": {
-            "AMC": {
+            "HK": {
                 "operations": {
                     "Noop":             { "airliner_cc":  0, "macro": "HK_CMD_MID", "airliner_msg": "HK_NoArgCmd_t" },
                     "Reset":            { "airliner_cc":  1, "macro": "HK_CMD_MID", "airliner_msg": "HK_NoArgCmd_t" },
