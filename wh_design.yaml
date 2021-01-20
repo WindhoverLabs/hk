@@ -91,7 +91,7 @@
       struct: 
   commands: 
     HK_CMD_MID: 
-      msgid: 
+      msgID: 
       commands: 
         Noop: 
           cc: 0
@@ -100,13 +100,13 @@
           cc: 1
           struct: CFE_SB_CmdHdr_t
     HK_SEND_HK_MID: 
-      msgid: 
+      msgID: 
       commands: 
         SendHK: 
           cc: 0
           struct: CFE_SB_CmdHdr_t
     HK_SEND_COMBINED_PKT_MID: 
-      msgid: 
+      msgID: 
       commands: 
         SendCombinedPkt: 
           cc: 0
