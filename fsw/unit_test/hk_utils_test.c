@@ -103,17 +103,17 @@ void HK_ProcessIncomingHkData_Test_MessageError(void)
     HK_Send_Out_Msg_t   CmdPacket;
     char ExpectedEventText[CFE_EVS_MAX_MESSAGE_LENGTH];
 
-    hk_copy_table_entry_t    CopyTable;
-    hk_runtime_tbl_entry_t   RuntimeTable;
+    hk_copy_table_entry_t    CopyTable[HK_COPY_TABLE_ENTRIES];
+    hk_runtime_tbl_entry_t   RuntimeTable[HK_COPY_TABLE_ENTRIES];
 
-    memset(&CopyTable, 0, sizeof(CopyTable));
-    memset(&RuntimeTable, 0, sizeof(RuntimeTable));
+    memset(CopyTable, 0, sizeof(CopyTable));
+    memset(RuntimeTable, 0, sizeof(RuntimeTable));
 
     /* Set if message length >= last byte acccessed to fail. */
-    CopyTable.InputOffset = sizeof(HK_Send_Out_Msg_t) + 1;
+    CopyTable[0].InputOffset = sizeof(HK_Send_Out_Msg_t) + 1;
 
-    HK_AppData.CopyTablePtr = &CopyTable;
-    HK_AppData.RuntimeTablePtr = &RuntimeTable;
+    HK_AppData.CopyTablePtr = CopyTable;
+    HK_AppData.RuntimeTablePtr = RuntimeTable;
 
     CFE_SB_InitMsg (&CmdPacket, HK_SEND_COMBINED_PKT_MID, sizeof(HK_Send_Out_Msg_t), TRUE);
 
