@@ -31,7 +31,7 @@
  #
  #############################################################################
  
-add_airliner_app_def(hk
+buildliner_add_app_def(hk
     FILE HK
     SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/hk_app.c
@@ -56,7 +56,7 @@ add_airliner_app_def(hk
         ${PROJECT_SOURCE_DIR}/apps/hk/fsw/platform_inc
 )
 
-add_airliner_app_unit_test(hk-ut
+buildliner_add_app_def(hk-ut
     UTASSERT 
     NO_HELGRIND
     NO_MASSIF
