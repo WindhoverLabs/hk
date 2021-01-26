@@ -56,7 +56,7 @@ buildliner_add_app_def(hk
         ${PROJECT_SOURCE_DIR}/apps/hk/fsw/platform_inc
 )
 
-buildliner_add_app_def(hk-ut
+buildliner_add_app_unit_test(hk-ut
     UTASSERT 
     NO_HELGRIND
     NO_MASSIF
